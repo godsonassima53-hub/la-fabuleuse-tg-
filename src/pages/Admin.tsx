@@ -85,31 +85,81 @@ const Admin: React.FC = () => {
     setUploading(true);
 
     try {
+      // Validation des champs
+      if (!formData.name.trim()) {
+        throw new Error('Le nom du plat est requis');
+      }
+      if (!formData.description.trim()) {
+        throw new Error('La description est requise');
+      }
+      if (!formData.price || formData.price <= 0) {
+        throw new Error('Le prix doit être supérieur à 0');
+      }
+      if (!formData.image || formData.image.trim() === '') {
+        throw new Error('L\'image est requise');
+      }
+
+      console.log('🔍 Validation des champs OK');
+      console.log('📸 Image type:', formData.image.startsWith('data:image/') ? 'Base64' : 'URL');
+
       const itemData = {
-        name: formData.name,
+        name: formData.name.trim(),
         price: Number(formData.price),
-        description: formData.description,
+        description: formData.description.trim(),
         category: formData.category,
-        image: formData.image || '', // S'assurer que l'image est bien une chaîne
+        image: formData.image.trim(),
+        available: true,
         createdAt: new Date()
       };
 
       console.log('📸 Données à sauvegarder:', itemData);
       console.log('🔗 URL image:', itemData.image);
 
+      // Test de connexion Firestore
+      console.log('🔥 Test connexion Firestore...');
+      const testDoc = await getDoc(doc(db, 'settings', 'general'));
+      console.log('🔥 Connexion Firestore OK:', testDoc.exists());
+
       if (editingItem) {
+        console.log('📝 Mise à jour du plat:', editingItem.id);
         await updateDoc(doc(db, 'menu', editingItem.id), itemData);
         toast.success('Plat mis à jour avec succès');
       } else {
-        await addDoc(collection(db, 'menu'), itemData);
+        console.log('➕ Ajout d\'un nouveau plat');
+        const docRef = await addDoc(collection(db, 'menu'), itemData);
+        console.log('✅ Plat ajouté avec ID:', docRef.id);
         toast.success('Plat ajouté avec succès');
       }
 
+      // Réinitialisation du formulaire
       setFormData({ name: '', description: '', price: 0, category: 'restaurant', image: '', available: true });
       setImageFile(null);
-    } catch (error) {
-      console.error('❌ Erreur sauvegarde:', error);
-      toast.error('Erreur lors de la sauvegarde');
+      
+    } catch (error: any) {
+      console.error('❌ Erreur détaillée:', error);
+      console.error('❌ Code erreur:', error.code);
+      console.error('❌ Message erreur:', error.message);
+      
+      // Message d'erreur spécifique
+      let errorMessage = 'Erreur lors de la sauvegarde';
+      
+      if (error.message.includes('name')) {
+        errorMessage = 'Le nom du plat est requis';
+      } else if (error.message.includes('description')) {
+        errorMessage = 'La description est requise';
+      } else if (error.message.includes('price')) {
+        errorMessage = 'Le prix est invalide';
+      } else if (error.message.includes('image')) {
+        errorMessage = 'L\'image est requise';
+      } else if (error.code === 'permission-denied') {
+        errorMessage = 'Permission refusée - Vérifiez les règles Firestore';
+      } else if (error.code === 'unavailable') {
+        errorMessage = 'Service Firebase indisponible - Réessayez plus tard';
+      } else if (error.code === 'deadline-exceeded') {
+        errorMessage = 'Délai d\'attente dépassé - Réessayez';
+      }
+      
+      toast.error(errorMessage);
     } finally {
       setUploading(false);
     }

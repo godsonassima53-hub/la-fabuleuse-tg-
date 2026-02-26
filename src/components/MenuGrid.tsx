@@ -73,7 +73,11 @@ const MenuGrid: React.FC<MenuGridProps> = ({ items }) => {
                 className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
+                  console.log('Erreur image:', item.image);
                   target.src = '/images/placeholder-plat.svg';
+                }}
+                onLoad={() => {
+                  console.log('Image chargée:', item.image);
                 }}
               />
               <div className="absolute top-4 right-4 bg-[#800020] text-white px-3 py-1 rounded-full text-sm font-bold">

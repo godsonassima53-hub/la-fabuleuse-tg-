@@ -13,9 +13,18 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ value, onChange, placeholder 
 
   const handleFileSelect = (file: File) => {
     if (file && file.type.startsWith('image/')) {
-      // Pour Netlify, on utilise le nom du fichier
-      const imageUrl = `/images/${file.name}`;
-      onChange(imageUrl);
+      // Pour Netlify, on utilise le nom du fichier avec l'extension correcte
+      const fileName = file.name.toLowerCase();
+      const fileExtension = fileName.split('.').pop();
+      
+      // Accepter tous les formats d'images
+      if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg'].includes(fileExtension || '')) {
+        const imageUrl = `/images/${fileName}`;
+        onChange(imageUrl);
+      } else {
+        // Si ce n'est pas une image valide, utiliser un placeholder
+        onChange('/images/placeholder-plat.svg');
+      }
     }
   };
 
@@ -102,9 +111,10 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ value, onChange, placeholder 
           </div>
           
           <div className="text-xs text-gray-500 space-y-1">
-            <p>• Formats: JPG, PNG, WebP</p>
+            <p>• Formats: JPG, PNG, GIF, WebP, BMP, SVG</p>
             <p>• Taille: 800x600px recommandé</p>
-            <p>• Poids: &lt; 200KB</p>
+            <p>• Poids: &lt; 500KB (augmenté pour captures)</p>
+            <p>• Captures d'écran: Acceptées</p>
           </div>
         </div>
       </div>

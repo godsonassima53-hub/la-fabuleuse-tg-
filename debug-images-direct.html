@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Direct Images - LA FABULEUSE</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #1a1a1a; color: white; }
+        .test-container { max-width: 800px; margin: 0 auto; }
+        .test-item { background: #2a2a2a; padding: 20px; margin: 20px 0; border-radius: 10px; border: 1px solid #d4af37; }
+        .image-test { width: 200px; height: 150px; background: #333; border: 2px solid #d4af37; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin: 10px 0; }
+        .success { border-color: #4caf50; }
+        .error { border-color: #f44336; }
+        .log { background: #000; padding: 15px; border-radius: 5px; font-family: monospace; margin: 10px 0; }
+        button { background: #d4af37; color: black; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        button:hover { background: #b8962e; }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🔍 TEST DIRECT IMAGES - LA FABULEUSE</h1>
+        
+        <div class="test-item">
+            <h3>Test 1: Image placeholder</h3>
+            <div class="image-test" id="test1">
+                <img src="/images/placeholder-plat.svg" alt="Test placeholder" style="max-width: 100%; max-height: 100%;">
+            </div>
+            <div id="result1" class="log">En cours de test...</div>
+        </div>
+
+        <div class="test-item">
+            <h3>Test 2: Image capture d'écran</h3>
+            <div class="image-test" id="test2">
+                <img src="/images/capture-test.png" alt="Test capture" style="max-width: 100%; max-height: 100%;">
+            </div>
+            <div id="result2" class="log">En cours de test...</div>
+        </div>
+
+        <div class="test-item">
+            <h3>Test 3: Image externe</h3>
+            <div class="image-test" id="test3">
+                <img src="https://picsum.photos/seed/fabuleuse/200/150" alt="Test externe" style="max-width: 100%; max-height: 100%;">
+            </div>
+            <div id="result3" class="log">En cours de test...</div>
+        </div>
+
+        <button onclick="runAllTests()">🚀 Lancer tous les tests</button>
+        <button onclick="clearResults()">🗑️ Effacer les résultats</button>
+
+        <div id="globalLog" class="log">
+            <h4>📋 Logs complets :</h4>
+            <div id="logs">En attente des tests...</div>
+        </div>
+    </div>
+
+    <script>
+        function testImage(id, imageUrl, testName) {
+            const img = new Image();
+            const startTime = Date.now();
+            
+            img.onload = function() {
+                const endTime = Date.now();
+                const loadTime = endTime - startTime;
+                const resultDiv = document.getElementById('result' + id);
+                const testDiv = document.getElementById('test' + id);
+                
+                resultDiv.innerHTML = `✅ ${testName}: CHARGÉE en ${loadTime}ms`;
+                resultDiv.className = 'log success';
+                testDiv.className = 'image-test success';
+                
+                addLog(`✅ ${testName}: Image chargée avec succès (${loadTime}ms)`);
+            };
+            
+            img.onerror = function() {
+                const resultDiv = document.getElementById('result' + id);
+                const testDiv = document.getElementById('test' + id);
+                
+                resultDiv.innerHTML = `❌ ${testName}: ERREUR - Image non trouvée`;
+                resultDiv.className = 'log error';
+                testDiv.className = 'image-test error';
+                
+                addLog(`❌ ${testName}: ERREUR - Image non trouvée à ${imageUrl}`);
+            };
+            
+            img.src = imageUrl;
+        }
+        
+        function addLog(message) {
+            const logsDiv = document.getElementById('logs');
+            const timestamp = new Date().toLocaleTimeString();
+            logsDiv.innerHTML = `[${timestamp}] ${message}<br>` + logsDiv.innerHTML;
+        }
+        
+        function runAllTests() {
+            clearResults();
+            addLog('🚀 Début des tests d\'images...');
+            
+            // Test 1: Placeholder
+            setTimeout(() => testImage(1, '/images/placeholder-plat.svg', 'Placeholder SVG'), 100);
+            
+            // Test 2: Capture d'écran
+            setTimeout(() => testImage(2, '/images/capture-test.png', 'Capture d\'écran'), 500);
+            
+            // Test 3: Image externe
+            setTimeout(() => testImage(3, 'https://picsum.photos/seed/fabuleuse/200/150', 'Image externe'), 900);
+        }
+        
+        function clearResults() {
+            document.getElementById('result1').innerHTML = 'En cours de test...';
+            document.getElementById('result2').innerHTML = 'En cours de test...';
+            document.getElementById('result3').innerHTML = 'En cours de test...';
+            document.getElementById('logs').innerHTML = 'En attente des tests...';
+            
+            document.getElementById('test1').className = 'image-test';
+            document.getElementById('test2').className = 'image-test';
+            document.getElementById('test3').className = 'image-test';
+        }
+        
+        // Lancer les tests automatiquement au chargement
+        window.onload = function() {
+            setTimeout(runAllTests, 1000);
+        };
+    </script>
+</body>
+</html>

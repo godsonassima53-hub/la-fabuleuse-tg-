@@ -68,10 +68,13 @@ const MenuGrid: React.FC<MenuGridProps> = ({ items }) => {
           >
             <div className="relative h-64 overflow-hidden">
               <img 
-                src={item.image || 'https://picsum.photos/seed/food/800/600'} 
+                src={item.image || '/images/placeholder-plat.svg'} 
                 alt={item.name}
                 className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                referrerPolicy="no-referrer"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.src = '/images/placeholder-plat.svg';
+                }}
               />
               <div className="absolute top-4 right-4 bg-[#800020] text-white px-3 py-1 rounded-full text-sm font-bold">
                 {item.price.toLocaleString()} FCFA

@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
-import { auth, db, storage, DEFAULT_CONFIG } from '../lib/firebase';
+import { auth, db, DEFAULT_CONFIG } from '../lib/firebase';
 import { useNavigate } from 'react-router-dom';
 import { collection, query, onSnapshot, addDoc, deleteDoc, doc, updateDoc, setDoc, getDoc } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { MenuItem, AppSettings } from '../types';
 import { 
-  LogOut, Plus, Trash2, Edit2, Save, X, Image as ImageIcon, 
+  LogOut, Plus, Trash2, Edit2, Save, X, 
   Settings as SettingsIcon, Utensils, LayoutDashboard, Phone, MapPin, Globe
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
@@ -17,7 +16,7 @@ const Admin: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [settings, setSettings] = useState<AppSettings>({
-    whatsappNumber: '96058543',
+    whatsappNumber: DEFAULT_CONFIG.whatsappNumber,
     address: 'Lomé, Togo',
     facebookUrl: '',
     instagramUrl: ''
@@ -84,12 +83,14 @@ const Admin: React.FC = () => {
     e.preventDefault();
     setUploading(true);
     try {
+      // Pour Netlify, on utilise uniquement des images locales
       let imageUrl = formData.image;
 
+      // Si une image est uploadée, on la sauvegarde localement
       if (imageFile) {
-        const storageRef = ref(storage, `menu/${Date.now()}_${imageFile.name}`);
-        await uploadBytes(storageRef, imageFile);
-        imageUrl = await getDownloadURL(storageRef);
+        // Pour l'instant, on utilise une URL par défaut
+        // En production, vous devrez uploader manuellement les images dans public/images/
+        imageUrl = `/images/${imageFile.name}`;
       }
 
       const itemData = { ...formData, image: imageUrl };
@@ -404,8 +405,7 @@ const Admin: React.FC = () => {
                     <label className="text-xs font-bold text-gray-500 uppercase tracking-widest">Image</label>
                     <div className="flex gap-4">
                       <label className="flex-1 bg-white/5 border border-white/10 border-dashed rounded-xl py-3 px-4 flex items-center justify-center gap-2 cursor-pointer hover:bg-white/10 transition-all">
-                        <ImageIcon size={20} className="text-[#d4af37]" />
-                        <span className="text-sm text-gray-400">{imageFile ? imageFile.name : 'Choisir une image'}</span>
+                        <span className="text-sm text-gray-400">{imageFile ? imageFile.name : 'Images locales (public/images/)'}</span>
                         <input
                           type="file"
                           accept="image/*"

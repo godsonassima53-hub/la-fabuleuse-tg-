@@ -1,21 +1,21 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Menu items - read access for everyone, write access for authenticated users only
+    // Menu items - lecture publique, écriture admin uniquement
     match /menu/{docId} {
       allow read: if true;
       allow write: if request.auth != null;
       allow delete: if request.auth != null;
     }
     
-    // Settings - read access for everyone, write access for authenticated users only
+    // Settings - lecture publique, écriture admin uniquement
     match /settings/{docId} {
       allow read: if true;
       allow write: if request.auth != null;
       allow update: if request.auth != null;
     }
     
-    // Orders collection (for future use) - restricted access
+    // Orders (réservé pour usage futur)
     match /orders/{docId} {
       allow read: if request.auth != null;
       allow write: if request.auth != null;

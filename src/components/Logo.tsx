@@ -15,13 +15,9 @@ const Logo: React.FC<LogoProps> = ({ size = 'medium', className = '' }) => {
   return (
     <div className={`${sizeClasses[size]} ${className}`}>
       <img 
-        src="/logo-la-fabuleuse.png" 
+        src="/favicon.svg" 
         alt="LA FABULEUSE" 
         className="w-full h-full object-cover rounded-full"
-        onError={(e) => {
-          const target = e.target as HTMLImageElement;
-          target.src = '/favicon.svg';
-        }}
       />
     </div>
   );

@@ -85,22 +85,29 @@ const Admin: React.FC = () => {
     setUploading(true);
 
     try {
-      // Validation des champs
-      if (!formData.name.trim()) {
+      console.log('🔍 Début sauvegarde plat');
+      console.log('📝 Formulaire actuel:', formData);
+
+      // Validation des champs - CORRIGÉ
+      if (!formData.name || formData.name.trim() === '') {
         throw new Error('Le nom du plat est requis');
       }
-      if (!formData.description.trim()) {
+      if (!formData.description || formData.description.trim() === '') {
         throw new Error('La description est requise');
       }
       if (!formData.price || formData.price <= 0) {
         throw new Error('Le prix doit être supérieur à 0');
       }
+      
+      // CORRIGÉ: Vérification correcte de l'image
       if (!formData.image || formData.image.trim() === '') {
+        console.error('❌ Image vide ou manquante:', formData.image);
         throw new Error('L\'image est requise');
       }
 
-      console.log('🔍 Validation des champs OK');
-      console.log('📸 Image type:', formData.image.startsWith('data:image/') ? 'Base64' : 'URL');
+      console.log('✅ Validation des champs OK');
+      console.log('📸 Image présente:', formData.image ? 'OUI' : 'NON');
+      console.log('📸 Type image:', formData.image.startsWith('data:image/') ? 'Base64' : 'URL');
 
       const itemData = {
         name: formData.name.trim(),
@@ -112,8 +119,7 @@ const Admin: React.FC = () => {
         createdAt: new Date()
       };
 
-      console.log('📸 Données à sauvegarder:', itemData);
-      console.log('🔗 URL image:', itemData.image);
+      console.log('📸 Données finales à sauvegarder:', itemData);
 
       // Test de connexion Firestore
       console.log('🔥 Test connexion Firestore...');
@@ -143,14 +149,14 @@ const Admin: React.FC = () => {
       // Message d'erreur spécifique
       let errorMessage = 'Erreur lors de la sauvegarde';
       
-      if (error.message.includes('name')) {
+      if (error.message && error.message.includes('nom')) {
         errorMessage = 'Le nom du plat est requis';
-      } else if (error.message.includes('description')) {
+      } else if (error.message && error.message.includes('description')) {
         errorMessage = 'La description est requise';
-      } else if (error.message.includes('price')) {
+      } else if (error.message && error.message.includes('prix')) {
         errorMessage = 'Le prix est invalide';
-      } else if (error.message.includes('image')) {
-        errorMessage = 'L\'image est requise';
+      } else if (error.message && error.message.includes('image')) {
+        errorMessage = 'L\'image est requise - Veuillez sélectionner une image';
       } else if (error.code === 'permission-denied') {
         errorMessage = 'Permission refusée - Vérifiez les règles Firestore';
       } else if (error.code === 'unavailable') {

@@ -68,14 +68,14 @@ const MenuGrid: React.FC<MenuGridProps> = ({ items }) => {
             className="bg-[#1a1a1a] rounded-2xl overflow-hidden border border-white/5 hover:border-[#d4af37]/30 transition-all group"
           >
             {/* Debug temporaire - à commenter en production */}
-            <ImageDebug imageUrl={item.image} itemName={item.name} />
+            {/* <ImageDebug imageUrl={item.image} itemName={item.name} /> */}
             
             <div className="relative h-48 overflow-hidden bg-[#2a2a2a] rounded-t-xl">
               {item.image && item.image.trim() !== '' ? (
                 <img 
                   src={item.image} 
                   alt={item.name}
-                  className="w-full h-full object-cover"
+                  className="w-full h-48 object-cover"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
                     console.error('❌ Erreur image:', item.image);
@@ -84,7 +84,7 @@ const MenuGrid: React.FC<MenuGridProps> = ({ items }) => {
                     const parent = target.parentElement;
                     if (parent && !parent.querySelector('.placeholder-fallback')) {
                       const placeholder = document.createElement('div');
-                      placeholder.className = 'placeholder-fallback w-full h-full flex items-center justify-center bg-[#2a2a2a] text-[#d4af37]';
+                      placeholder.className = 'placeholder-fallback w-full h-48 flex items-center justify-center bg-[#2a2a2a] text-[#d4af37]';
                       placeholder.innerHTML = `
                         <div class="text-center">
                           <div class="text-4xl mb-2">🍽️</div>
@@ -95,11 +95,11 @@ const MenuGrid: React.FC<MenuGridProps> = ({ items }) => {
                     }
                   }}
                   onLoad={() => {
-                    console.log('✅ Image chargée avec succès:', item.image);
+                    console.log('✅ Image chargée avec succès:', item.name);
                   }}
                 />
               ) : (
-                <div className="w-full h-full flex items-center justify-center bg-[#2a2a2a] text-[#d4af37]">
+                <div className="w-full h-48 flex items-center justify-center bg-[#2a2a2a] text-[#d4af37]">
                   <div className="text-center">
                     <div className="text-4xl mb-2">🍽️</div>
                     <div className="text-sm">Image à venir</div>

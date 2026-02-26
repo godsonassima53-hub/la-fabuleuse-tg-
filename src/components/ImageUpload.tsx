@@ -9,27 +9,34 @@ interface ImageUploadProps {
 
 const ImageUpload: React.FC<ImageUploadProps> = ({ value, onChange, placeholder = "URL de l'image" }) => {
   const [isDragging, setIsDragging] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileSelect = (file: File) => {
+    console.log(' Fichier sélectionné:', file.name);
+    console.log(' Type:', file.type);
+    console.log(' Taille:', file.size, 'octets');
+
+    // Validation simple : accepter tous les types d'images
     if (file && file.type.startsWith('image/')) {
-      // Pour Netlify, on utilise une URL externe ou base64
-      const fileName = file.name.toLowerCase();
-      const fileExtension = fileName.split('.').pop();
+      setSelectedFile(file);
       
-      // Accepter tous les formats d'images
-      if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg'].includes(fileExtension || '')) {
-        // Convertir en base64 pour éviter les problèmes de chemin
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          const base64 = e.target?.result as string;
-          onChange(base64);
-        };
-        reader.readAsDataURL(file);
-      } else {
-        // Si ce n'est pas une image valide, utiliser un placeholder
-        onChange('/images/placeholder-plat.svg');
-      }
+      // Convertir en base64 pour stockage direct
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const base64 = e.target?.result as string;
+        console.log(' Image convertie en base64, longueur:', base64.length);
+        onChange(base64);
+      };
+      reader.onerror = (error) => {
+        console.error(' Erreur lecture fichier:', error);
+        onChange('');
+      };
+      reader.readAsDataURL(file);
+    } else {
+      console.error(' Fichier non valide:', file?.type);
+      setSelectedFile(null);
+      onChange('');
     }
   };
 
@@ -56,7 +63,16 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ value, onChange, placeholder 
   const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files && files.length > 0) {
-      handleFileSelect(files[0]);
+      const file = files[0];
+      handleFileSelect(file);
+    }
+  };
+
+  const clearImage = () => {
+    setSelectedFile(null);
+    onChange('');
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
     }
   };
 
@@ -65,16 +81,17 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ value, onChange, placeholder 
       <label className="text-xs font-bold text-gray-500 uppercase tracking-widest">Image du plat</label>
       
       {/* Aperçu de l'image */}
-      {value && (
+      {value && value.trim() !== '' && (
         <div className="relative group">
           <div className="w-full h-48 rounded-xl overflow-hidden bg-[#141414] border border-white/10">
             <img 
               src={value} 
               alt="Aperçu" 
-              className="w-full h-full object-cover transition-transform group-hover:scale-105 duration-300"
+              className="w-full h-48 object-cover rounded-xl transition-transform group-hover:scale-105 duration-300"
               onError={(e) => {
+                console.error(' Erreur aperçu image:', value);
                 const target = e.target as HTMLImageElement;
-                target.src = '/images/placeholder-plat.jpg';
+                target.src = '/images/placeholder-plat.svg';
               }}
             />
           </div>
@@ -82,10 +99,10 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ value, onChange, placeholder 
           {/* Bouton pour changer l'image */}
           <button
             type="button"
-            onClick={() => fileInputRef.current?.click()}
-            className="absolute top-2 right-2 bg-black/70 hover:bg-black text-white p-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
+            onClick={clearImage}
+            className="absolute top-2 right-2 bg-red-600 hover:bg-red-700 text-white p-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
           >
-            <Upload size={16} />
+            <X size={16} />
           </button>
         </div>
       )}
@@ -113,13 +130,17 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ value, onChange, placeholder 
           <div className="space-y-2">
             <p className="text-white font-medium">Glissez-déposez une image</p>
             <p className="text-gray-400 text-sm">ou cliquez pour parcourir</p>
+            {selectedFile && (
+              <p className="text-[#d4af37] text-sm font-medium">
+                {selectedFile.name} sélectionné
+              </p>
+            )}
           </div>
           
           <div className="text-xs text-gray-500 space-y-1">
             <p>• Formats: JPG, PNG, GIF, WebP, BMP, SVG</p>
             <p>• Taille: 800x600px recommandé</p>
-            <p>• Poids: &lt; 500KB (augmenté pour captures)</p>
-            <p>• Captures d'écran: Acceptées</p>
+            <p>• Poids: &lt; 2MB maximum</p>
           </div>
         </div>
       </div>

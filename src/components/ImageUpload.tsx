@@ -13,14 +13,19 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ value, onChange, placeholder 
 
   const handleFileSelect = (file: File) => {
     if (file && file.type.startsWith('image/')) {
-      // Pour Netlify, on utilise le nom du fichier avec l'extension correcte
+      // Pour Netlify, on utilise une URL externe ou base64
       const fileName = file.name.toLowerCase();
       const fileExtension = fileName.split('.').pop();
       
       // Accepter tous les formats d'images
       if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg'].includes(fileExtension || '')) {
-        const imageUrl = `/images/${fileName}`;
-        onChange(imageUrl);
+        // Convertir en base64 pour éviter les problèmes de chemin
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const base64 = e.target?.result as string;
+          onChange(base64);
+        };
+        reader.readAsDataURL(file);
       } else {
         // Si ce n'est pas une image valide, utiliser un placeholder
         onChange('/images/placeholder-plat.svg');
@@ -132,10 +137,10 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ value, onChange, placeholder 
       <div className="bg-[#d4af37]/5 border border-[#d4af37]/20 rounded-lg p-4 mt-4">
         <h4 className="text-[#d4af37] font-bold text-sm mb-2">📸 Instructions pour les images</h4>
         <ul className="text-gray-300 text-sm space-y-1">
-          <li>• Déposez l'image dans <code className="bg-black/30 px-1 rounded">public/images/</code></li>
-          <li>• Nommez simplement: <code className="bg-black/30 px-1 rounded">nom-image.jpg</code></li>
-          <li>• Dans l'admin, utilisez: <code className="bg-black/30 px-1 rounded">/images/nom-image.jpg</code></li>
-          <li>• L'image sera automatiquement accessible sur le site</li>
+          <li>• Images converties automatiquement en base64</li>
+          <li>• Pas besoin de déplacer les fichiers manuellement</li>
+          <li>• Images intégrées directement dans la base de données</li>
+          <li>• Accessibles immédiatement pour tous les clients</li>
         </ul>
       </div>
     </div>

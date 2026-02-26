@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Connexion Firebase</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
+        .container { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; }
+        .log { background: #f8f9fa; padding: 10px; margin: 10px 0; border-radius: 5px; font-family: monospace; }
+        .error { background: #ffebee; color: #c62828; }
+        .success { background: #e8f5e8; color: #2e7d32; }
+        .info { background: #e3f2fd; color: #1565c0; }
+        button { background: #1976d2; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #1565c0; }
+        input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Test Connexion Firebase - LA FABULEUSE</h1>
+        
+        <div class="form">
+            <input type="email" id="email" placeholder="Email" value="admin@lafabuleuse.tg">
+            <input type="password" id="password" placeholder="Mot de passe" value="Admin123456!">
+            <button onclick="testConnection()">Tester la connexion</button>
+        </div>
+        
+        <div id="logs"></div>
+        
+        <div class="info">
+            <h3>📋 Étapes de vérification:</h3>
+            <ol>
+                <li>Cliquez sur "Tester la connexion"</li>
+                <li>Vérifiez les messages d'erreur</li>
+                <li>Suivez les solutions proposées</li>
+            </ol>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <script>
+        // Configuration Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyDC7vpefbMKCn9Jd3iGYlmo3ovfPISLn8s",
+            authDomain: "la-fabuleuse-b2c45.firebaseapp.com",
+            projectId: "la-fabuleuse-b2c45",
+            storageBucket: "la-fabuleuse-b2c45.firebasestorage.app",
+            messagingSenderId: "1070555352916",
+            appId: "1:1070555352916:web:d16818f208b040fc8182c1",
+            measurementId: "G-V1P0E061ER"
+        };
+
+        // Initialiser Firebase
+        firebase.initializeApp(firebaseConfig);
+        
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        
+        function addLog(message, type = 'info') {
+            const logs = document.getElementById('logs');
+            const div = document.createElement('div');
+            div.className = `log ${type}`;
+            div.innerHTML = `<strong>${new Date().toLocaleTimeString()}:</strong> ${message}`;
+            logs.appendChild(div);
+            logs.scrollTop = logs.scrollHeight;
+        }
+        
+        function testConnection() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            addLog('🔍 Début du test de connexion...', 'info');
+            
+            // Test 1: Initialisation Firebase
+            addLog('✅ Firebase initialisé avec succès', 'success');
+            
+            // Test 2: Connexion Auth
+            addLog('🔐 Test de connexion Auth...', 'info');
+            
+            auth.signInWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    addLog(`✅ Connexion réussie: ${userCredential.user.email}`, 'success');
+                    
+                    // Test 3: Firestore
+                    addLog('📚 Test de connexion Firestore...', 'info');
+                    
+                    db.collection('settings').get()
+                        .then((snapshot) => {
+                            addLog(`✅ Firestore accessible: ${snapshot.size} documents trouvés`, 'success');
+                            
+                            if (snapshot.size === 0) {
+                                addLog('⚠️ Collection settings vide - Créez un document "general"', 'info');
+                            }
+                        })
+                        .catch((error) => {
+                            addLog(`❌ Erreur Firestore: ${error.message}`, 'error');
+                            
+                            if (error.message.includes('permission-denied')) {
+                                addLog('💡 Solution: Appliquez les règles de sécurité Firestore', 'info');
+                            }
+                        });
+                })
+                .catch((error) => {
+                    addLog(`❌ Erreur de connexion: ${error.message}`, 'error');
+                    
+                    // Solutions spécifiques
+                    if (error.code === 'auth/user-not-found') {
+                        addLog('💡 Solution: Créez l utilisateur admin dans Firebase Console → Authentication → Users', 'info');
+                    } else if (error.code === 'auth/wrong-password') {
+                        addLog('💡 Solution: Vérifiez le mot de passe de l utilisateur admin', 'info');
+                    } else if (error.code === 'auth/invalid-email') {
+                        addLog('💡 Solution: Vérifiez l email de l utilisateur admin', 'info');
+                    } else if (error.code === 'auth/api-key-not-allowed') {
+                        addLog('💡 Solution: Vérifiez la clé API Firebase dans Netlify Environment Variables', 'info');
+                    }
+                });
+        }
+        
+        // Test automatique au chargement
+        window.onload = function() {
+            addLog('🚀 Page de test chargée', 'info');
+            addLog('📝 Configuration Firebase chargée', 'info');
+        };
+    </script>
+</body>
+</html>

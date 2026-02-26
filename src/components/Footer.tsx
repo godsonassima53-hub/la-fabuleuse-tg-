@@ -1,6 +1,7 @@
 import React from 'react';
 import { AppSettings } from '../types';
 import { MapPin, Phone, Facebook, Instagram, UtensilsCrossed, Mail, Clock, Globe } from 'lucide-react';
+import Logo from './Logo';
 
 interface FooterProps {
   settings: AppSettings | null;
@@ -14,24 +15,7 @@ const Footer: React.FC<FooterProps> = ({ settings }) => {
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
         <div className="space-y-6">
           <div className="flex items-center gap-3">
-            <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-[#d4af37] bg-gradient-to-br from-[#1e3a8a] to-[#3b82f6] shadow-lg">
-              <img 
-                src="https://ais-pre-qllhdbb2u35bbhxj6zlhlu-25239373655.europe-west3.run.app/logo.png" 
-                alt="Logo LA FABULEUSE" 
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  e.currentTarget.outerHTML = `
-                    <svg viewBox="0 0 100 100" class="w-full h-full object-cover">
-                      <circle cx="50" cy="50" r="45" fill="#1e3a8a"/>
-                      <path d="M50 20 L60 35 L55 35 L55 45 L45 45 L45 35 L40 35 Z" fill="#d4af37"/>
-                      <rect x="35" y="50" width="30" height="8" fill="#d4af37"/>
-                      <rect x="40" y="60" width="20" height="6" fill="#d4af37"/>
-                      <text x="50" y="85" text-anchor="middle" fill="#d4af37" font-size="8" font-weight="bold">LA FABULEUSE</text>
-                    </svg>
-                  `;
-                }}
-              />
-            </div>
+            <Logo size="large" className="border-2 border-[#d4af37]" />
             <span className="text-2xl font-bold tracking-tighter text-white">LA FABULEUSE</span>
           </div>
           <p className="text-gray-500 text-sm leading-relaxed">
@@ -71,15 +55,15 @@ const Footer: React.FC<FooterProps> = ({ settings }) => {
           <ul className="space-y-2 text-gray-400 text-sm">
             <li className="flex justify-between">
               <span>Lun-Jeu</span>
-              <span className="text-[#d4af37]">11h-23h</span>
+              <span className="text-[#d4af37]">7h30-23h</span>
             </li>
             <li className="flex justify-between">
               <span>Ven-Sam</span>
-              <span className="text-[#d4af37]">11h-02h</span>
+              <span className="text-[#d4af37]">7h30-2h</span>
             </li>
             <li className="flex justify-between">
               <span>Dimanche</span>
-              <span className="text-[#d4af37]">12h-22h</span>
+              <span className="text-[#d4af37]">7h30-23h</span>
             </li>
           </ul>
         </div>

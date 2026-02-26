@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { toast } from 'react-hot-toast';
+import ImageUpload from '../components/ImageUpload';
 
 const Admin: React.FC = () => {
   const [user, setUser] = useState<any>(null);
@@ -402,18 +403,10 @@ const Admin: React.FC = () => {
                     </select>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-xs font-bold text-gray-500 uppercase tracking-widest">Image</label>
-                    <div className="flex gap-4">
-                      <label className="flex-1 bg-white/5 border border-white/10 border-dashed rounded-xl py-3 px-4 flex items-center justify-center gap-2 cursor-pointer hover:bg-white/10 transition-all">
-                        <span className="text-sm text-gray-400">{imageFile ? imageFile.name : 'Images locales (public/images/)'}</span>
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={e => setImageFile(e.target.files?.[0] || null)}
-                          className="hidden"
-                        />
-                      </label>
-                    </div>
+                    <ImageUpload
+                      value={formData.image}
+                      onChange={(url) => setFormData({ ...formData, image: url })}
+                    />
                   </div>
                 </div>
 

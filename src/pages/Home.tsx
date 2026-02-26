@@ -6,6 +6,7 @@ import Header from '../components/Header';
 import MenuGrid from '../components/MenuGrid';
 import CartSidebar from '../components/CartSidebar';
 import Footer from '../components/Footer';
+import Logo from '../components/Logo';
 import { motion, AnimatePresence } from 'motion/react';
 import { ShoppingCart } from 'lucide-react';
 import { useCart } from '../context/CartContext';
@@ -77,28 +78,7 @@ const Home: React.FC = () => {
             transition={{ duration: 0.8 }}
           >
             <div className="mb-6 flex justify-center">
-              <div className="w-24 h-24 rounded-full overflow-hidden border-[3px] border-[#d4af37] bg-gradient-to-br from-[#1e3a8a] to-[#3b82f6] shadow-2xl flex items-center justify-center">
-                <img 
-                  src="https://ais-pre-qllhdbb2u35bbhxj6zlhlu-25239373655.europe-west3.run.app/logo.png" 
-                  alt="Logo LA FABULEUSE" 
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    const target = e.currentTarget;
-                    const parent = target.parentElement;
-                    if (parent) {
-                      parent.innerHTML = `
-                        <svg viewBox="0 0 100 100" class="w-full h-full object-cover">
-                          <circle cx="50" cy="50" r="45" fill="#1e3a8a"/>
-                          <path d="M50 20 L60 35 L55 35 L55 45 L45 45 L45 35 L40 35 Z" fill="#d4af37"/>
-                          <rect x="35" y="50" width="30" height="8" fill="#d4af37"/>
-                          <rect x="40" y="60" width="20" height="6" fill="#d4af37"/>
-                          <text x="50" y="85" text-anchor="middle" fill="#d4af37" font-size="8" font-weight="bold">LA FABULEUSE</text>
-                        </svg>
-                      `;
-                    }
-                  }}
-                />
-              </div>
+              <Logo size="large" className="border-[3px] border-[#d4af37] shadow-2xl" />
             </div>
             <span className="text-[#d4af37] uppercase tracking-[0.4em] font-bold text-sm mb-4 block">Bienvenue à</span>
             <h1 className="text-6xl md:text-8xl font-bold mb-6 text-white tracking-tighter font-display">

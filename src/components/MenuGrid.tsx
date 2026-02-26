@@ -4,6 +4,7 @@ import { motion } from 'motion/react';
 import { Plus, ShoppingCart } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { toast } from 'react-hot-toast';
+import ImageDebug from './ImageDebug';
 
 interface MenuGridProps {
   items: MenuItem[];
@@ -66,21 +67,46 @@ const MenuGrid: React.FC<MenuGridProps> = ({ items }) => {
             transition={{ delay: index * 0.05 }}
             className="bg-[#1a1a1a] rounded-2xl overflow-hidden border border-white/5 hover:border-[#d4af37]/30 transition-all group"
           >
-            <div className="relative h-64 overflow-hidden">
-              <img 
-                src={item.image || '/images/placeholder-plat.svg'} 
-                alt={item.name}
-                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  console.log('Erreur image:', item.image);
-                  target.src = '/images/placeholder-plat.svg';
-                }}
-                onLoad={() => {
-                  console.log('Image chargée:', item.image);
-                }}
-              />
-              <div className="absolute top-4 right-4 bg-[#800020] text-white px-3 py-1 rounded-full text-sm font-bold">
+            {/* Debug temporaire - à commenter en production */}
+            <ImageDebug imageUrl={item.image} itemName={item.name} />
+            
+            <div className="relative h-48 overflow-hidden bg-[#2a2a2a] rounded-t-xl">
+              {item.image && item.image.trim() !== '' ? (
+                <img 
+                  src={item.image} 
+                  alt={item.name}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    console.error('❌ Erreur image:', item.image);
+                    target.style.display = 'none';
+                    // Créer un placeholder si l'image échoue
+                    const parent = target.parentElement;
+                    if (parent && !parent.querySelector('.placeholder-fallback')) {
+                      const placeholder = document.createElement('div');
+                      placeholder.className = 'placeholder-fallback w-full h-full flex items-center justify-center bg-[#2a2a2a] text-[#d4af37]';
+                      placeholder.innerHTML = `
+                        <div class="text-center">
+                          <div class="text-4xl mb-2">🍽️</div>
+                          <div class="text-sm">Image non disponible</div>
+                        </div>
+                      `;
+                      parent.appendChild(placeholder);
+                    }
+                  }}
+                  onLoad={() => {
+                    console.log('✅ Image chargée avec succès:', item.image);
+                  }}
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center bg-[#2a2a2a] text-[#d4af37]">
+                  <div className="text-center">
+                    <div className="text-4xl mb-2">🍽️</div>
+                    <div className="text-sm">Image à venir</div>
+                  </div>
+                </div>
+              )}
+              <div className="absolute top-3 right-3 bg-[#800020] text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg">
                 {item.price.toLocaleString()} FCFA
               </div>
             </div>

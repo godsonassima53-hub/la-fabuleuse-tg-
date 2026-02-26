@@ -83,33 +83,33 @@ const Admin: React.FC = () => {
   const handleSaveItem = async (e: React.FormEvent) => {
     e.preventDefault();
     setUploading(true);
+
     try {
-      // Pour Netlify, on utilise uniquement des images locales
-      let imageUrl = formData.image;
+      const itemData = {
+        name: formData.name,
+        price: Number(formData.price),
+        description: formData.description,
+        category: formData.category,
+        image: formData.image || '', // S'assurer que l'image est bien une chaîne
+        createdAt: new Date()
+      };
 
-      // Si une image est uploadée, on la sauvegarde localement
-      if (imageFile) {
-        // Pour l'instant, on utilise une URL par défaut
-        // En production, vous devrez uploader manuellement les images dans public/images/
-        imageUrl = `/images/${imageFile.name}`;
-      }
-
-      const itemData = { ...formData, image: imageUrl };
+      console.log('📸 Données à sauvegarder:', itemData);
+      console.log('🔗 URL image:', itemData.image);
 
       if (editingItem) {
         await updateDoc(doc(db, 'menu', editingItem.id), itemData);
-        toast.success('Plat mis à jour');
+        toast.success('Plat mis à jour avec succès');
       } else {
         await addDoc(collection(db, 'menu'), itemData);
-        toast.success('Plat ajouté');
+        toast.success('Plat ajouté avec succès');
       }
 
-      setIsModalOpen(false);
-      setEditingItem(null);
       setFormData({ name: '', description: '', price: 0, category: 'restaurant', image: '', available: true });
       setImageFile(null);
-    } catch (error: any) {
-      toast.error('Erreur : ' + error.message);
+    } catch (error) {
+      console.error('❌ Erreur sauvegarde:', error);
+      toast.error('Erreur lors de la sauvegarde');
     } finally {
       setUploading(false);
     }
